@@ -32,6 +32,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <time.h>
 
 #include "packets.h"
 #include "user.h"
@@ -51,7 +52,7 @@ struct spawnedItem
   
   spawnedItem()
   {
-    spawnedAt = time(0);
+    spawnedAt = time(NULL);
     spawnedBy = 0;
   }
 };
@@ -83,6 +84,7 @@ struct furnaceData
   Item items[3];
   int16_t burnTime;
   int16_t cookTime;
+  int32_t map;
 };
 
 struct sChunk
@@ -363,10 +365,10 @@ public:
 
   sChunkNode** getBuckets()
   {
-    return &m_buckets[0];
+    return m_buckets;
   }
 
-private:
+//private:
   sChunkNode* m_buckets[441];
 };
 
