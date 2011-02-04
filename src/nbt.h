@@ -33,7 +33,6 @@
 #include <vector>
 
 #include <stdint.h>
-#include <zlib.h>
 
 class NBT_Value
 {

@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2C8A5E82-2669-4C72-BEA8-C29F61B59F49}</ProjectGuid>
+    <ProjectGuid>{8BF3BBA7-4740-4138-BAB6-674D1E54EFC3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>mineserver_filelog</RootNamespace>
-    <ProjectName>plugin_filelog</ProjectName>
+    <RootNamespace>mineserver_commands</RootNamespace>
+    <ProjectName>plugin_commands</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,12 +40,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\..\bin\</OutDir>
-    <TargetName>filelog</TargetName>
-    <IntDir>objs\$(Configuration)\</IntDir>
+    <TargetName>command</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\bin\</OutDir>
-    <TargetName>filelog</TargetName>
+    <TargetName>command</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -53,32 +52,30 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;mineserver_filelog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MINESERVER_COMMANDS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>..\..\bin\filelog.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;mineserver_filelog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MINESERVER_COMMANDS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <OutputFile>..\..\bin\filelog.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\filelog.cpp" />
+    <ClInclude Include="..\..\src\plugin_api.h" />
+    <ClInclude Include="src\command.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\plugin_api.h" />
+    <ClCompile Include="src\command.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

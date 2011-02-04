@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8BF3BBA7-4740-4138-BAB6-674D1E54EFC3}</ProjectGuid>
+    <ProjectGuid>{CD49F963-BA5B-43F2-9551-2B14AE455BB8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>mineserver_plugintest</RootNamespace>
-    <ProjectName>plugintest</ProjectName>
+    <RootNamespace>mineserver_binlog</RootNamespace>
+    <ProjectName>plugin_binlog</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -39,12 +39,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\bin\</OutDir>
-    <TargetName>command</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <TargetName>binlog</TargetName>
+    <IntDir>objs\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\bin</OutDir>
-    <TargetName>command</TargetName>
+    <OutDir>..\..\bin\</OutDir>
+    <TargetName>binlog</TargetName>
+    <IntDir>objs\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -52,32 +54,34 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MINESERVER_PLUGINTEST_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;mineserver_binlog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>..\..\bin\command.dll</OutputFile>
+      <OutputFile>..\..\bin\binlog.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MINESERVER_PLUGINTEST_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;mineserver_binlog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
-    <Link />
-    <Link />
-    <Link />
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>..\..\bin\binlog.dll</OutputFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\plugin_api.h" />
-    <ClInclude Include="src\command.h" />
+    <ClInclude Include="src/binlog.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\command.cpp" />
+    <ClCompile Include="src/binlog.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

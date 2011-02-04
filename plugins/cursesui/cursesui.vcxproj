@@ -55,6 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;mineserver_cursesui_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>D:\VCS\mineserver\mineserver\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -69,11 +70,11 @@
       </PrecompiledHeader>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;mineserver_cursesui_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>D:\VCS\mineserver\mineserver\includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link />
-    <Link />
-    <Link />
     <Link>
+      <SubSystem>Console</SubSystem>
+      <OutputFile>..\..\bin\cursesui.dll</OutputFile>
       <AdditionalDependencies>pdcurses.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

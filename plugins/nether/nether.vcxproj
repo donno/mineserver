@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2C8A5E82-2669-4C72-BEA8-C29F61B59F49}</ProjectGuid>
+    <ProjectGuid>{629215BD-BD1D-4C35-A6B5-5FEB1B4550F6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>mineserver_filelog</RootNamespace>
-    <ProjectName>plugin_filelog</ProjectName>
+    <RootNamespace>mineserver_nether</RootNamespace>
+    <ProjectName>plugin_nether</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,12 +40,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>..\..\bin\</OutDir>
-    <TargetName>filelog</TargetName>
+    <TargetName>nether</TargetName>
     <IntDir>objs\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\bin\</OutDir>
-    <TargetName>filelog</TargetName>
+    <TargetName>nether</TargetName>
+    <IntDir>objs\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -53,32 +54,34 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;mineserver_filelog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;mineserver_nether_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>..\..\bin\filelog.dll</OutputFile>
+      <OutputFile>..\..\bin\nether.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;mineserver_filelog_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;mineserver_nether_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <OutputFile>..\..\bin\filelog.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>..\..\bin\nether.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\filelog.cpp" />
+    <ClInclude Include="..\..\src\plugin_api.h" />
+    <ClInclude Include="nether.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\plugin_api.h" />
+    <ClCompile Include="nether.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
