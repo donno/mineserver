@@ -51,9 +51,11 @@ Mob::~Mob()
 
 void Mob::spawnToAll()
 {
-  for (int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    User* user = Mineserver::get()->users()[i];
+    User *user = *it;
     user->buffer << (int8_t)PACKET_MOB_SPAWN << (int32_t) UID << (int8_t) type 
                  << (int32_t) x << (int32_t) y << (int32_t) z << (int8_t) yaw 
                  << (int8_t) pitch;
@@ -71,9 +73,11 @@ void Mob::spawnToAll()
 
 void Mob::deSpawnToAll()
 {
-  for (int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    User* user = Mineserver::get()->users()[i];
+    User *user = *it;
     user->buffer << PACKET_DESTROY_ENTITY << (int32_t) UID;
   }
   spawned=false;
@@ -87,9 +91,11 @@ void Mob::relativeMoveToAll()
 void Mob::teleportToAll()
 {
   if(!spawned){ return; }
-  for (int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    User* user = Mineserver::get()->users()[i];
+    User *user = *it;
     user->buffer << PACKET_ENTITY_TELEPORT << (int32_t) UID
                  << (int32_t) x << (int32_t) y << (int32_t) z
                  << (int8_t) yaw << (int8_t) pitch;

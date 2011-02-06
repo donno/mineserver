@@ -67,16 +67,19 @@
 mineserver_pointer_struct plugin_api_pointers;
 
 // HELPER FUNCTIONS
-User* userFromName(std::string user)
+User* userFromName(std::string userName)
 {
-  for(unsigned int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged)
+    User *user = *it;
+    if(user->fd && user->logged)
     {
       // Don't send to his user if he is DND and the message is a chat message
-      if(user == Mineserver::get()->users()[i]->nick)
+      if(userName == user->nick)
       {
-        return Mineserver::get()->users()[i];
+        return user;
       }
     }
   }
@@ -208,14 +211,17 @@ bool chat_sendmsgTo(const char* user,const char* msg)
 	  LOG(INFO, "Chat", msg);
 	  return true;
   }
-  for(unsigned int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged)
+    User *user = *it;
+    if(user->fd && user->logged)
     {
       // Don't send to his user if he is DND and the message is a chat message
-      if(userStr == Mineserver::get()->users()[i]->nick)
+      if(userStr == user->nick)
       {
-        Mineserver::get()->users()[i]->buffer << (int8_t)PACKET_CHAT_MESSAGE << std::string(msg);
+        user->buffer << (int8_t)PACKET_CHAT_MESSAGE << std::string(msg);
         return true;
       }
     }
@@ -226,14 +232,17 @@ bool chat_sendmsgTo(const char* user,const char* msg)
 bool chat_sendmsg(const char* msg)
 {
   std::string msgStr(msg);
-  for(unsigned int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged)
+    User *user = *it;
+    if(user->fd && user->logged)
     {
       // Don't send to his user if he is DND and the message is a chat message
-      if(!(Mineserver::get()->users()[i]->dnd))
+      if(!(user->dnd))
       {
-        Mineserver::get()->users()[i]->buffer << (int8_t)PACKET_CHAT_MESSAGE << msgStr;
+        user->buffer << (int8_t)PACKET_CHAT_MESSAGE << msgStr;
       }
     }
   }
@@ -278,11 +287,9 @@ bool map_setTime(int timeValue)
   Mineserver::get()->map(0)->mapTime = timeValue;
   Packet pkt;
   pkt << (int8_t)PACKET_TIME_UPDATE << (int64_t)Mineserver::get()->map(0)->mapTime;
+  
+  User::sendAll((uint8_t*)pkt.getWrite(), pkt.getWriteLen());
 
-  if(User::all().size())
-  {
-    User::all()[0]->sendAll((uint8_t*)pkt.getWrite(), pkt.getWriteLen());
-  }
   return true;
 }
 
@@ -379,13 +386,16 @@ unsigned char* map_getMapData_blocklight(int x, int z)
 bool user_toggleDND(const char* user) 
 {
   std::string username(user);
-  for(unsigned int i=0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged) 
+    User *user = *it;
+    if(user->fd && user->logged) 
     {
-      if(username == Mineserver::get()->users()[i]->nick) 
+      if(username == user->nick) 
       {
-        Mineserver::get()->users()[i]->toggleDND();
+        user->toggleDND();
         return true;
       }
     }
@@ -397,26 +407,29 @@ bool user_toggleDND(const char* user)
 bool user_getPosition(const char* user, double* x, double* y, double* z,float* yaw, float* pitch, double *stance)
 {
   std::string userStr(user);
-  for(unsigned int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged)
+    User *user = *it;
+    if(user->fd && user->logged)
     {
       //Is this the user?
-      if(userStr == Mineserver::get()->users()[i]->nick)
+      if(userStr == user->nick)
       {
         //For safety, check for NULL pointers!
         if(x != NULL)
-          *x=Mineserver::get()->users()[i]->pos.x;
+          *x=user->pos.x;
         if(y != NULL)
-          *y=Mineserver::get()->users()[i]->pos.y;
+          *y=user->pos.y;
         if(z != NULL)
-          *z=Mineserver::get()->users()[i]->pos.z;
+          *z=user->pos.z;
         if(yaw != NULL)
-          *yaw=Mineserver::get()->users()[i]->pos.yaw;
+          *yaw=user->pos.yaw;
         if(pitch != NULL)
-          *pitch=Mineserver::get()->users()[i]->pos.pitch;
+          *pitch=user->pos.pitch;
         if(stance != NULL)
-          *stance=Mineserver::get()->users()[i]->pos.stance;
+          *stance=user->pos.stance;
         //We found the user
         return true;
       }
@@ -429,28 +442,31 @@ bool user_getPosition(const char* user, double* x, double* y, double* z,float* y
 bool user_getPositionW(const char* user, double* x, double* y, double* z, int* w,float* yaw, float* pitch, double *stance)
 {
   std::string userStr(user);
-  for(unsigned int i = 0; i < Mineserver::get()->users().size(); i++)
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if(Mineserver::get()->users()[i]->fd && Mineserver::get()->users()[i]->logged)
+    User *user = *it;
+    if(user->fd && user->logged)
     {
       //Is this the user?
-      if(userStr == Mineserver::get()->users()[i]->nick)
+      if(userStr == user->nick)
       {
         //For safety, check for NULL pointers!
         if(x != NULL)
-          *x=Mineserver::get()->users()[i]->pos.x;
+          *x=user->pos.x;
         if(y != NULL)
-          *y=Mineserver::get()->users()[i]->pos.y;
+          *y=user->pos.y;
         if(z != NULL)
-          *z=Mineserver::get()->users()[i]->pos.z;
+          *z=user->pos.z;
         if(yaw != NULL)
-          *yaw=Mineserver::get()->users()[i]->pos.yaw;
+          *yaw=user->pos.yaw;
         if(pitch != NULL)
-          *pitch=Mineserver::get()->users()[i]->pos.pitch;
+          *pitch=user->pos.pitch;
         if(stance != NULL)
-          *stance=Mineserver::get()->users()[i]->pos.stance;
+          *stance=user->pos.stance;
         if(w != NULL)
-          *w=Mineserver::get()->users()[i]->pos.map;
+          *w=user->pos.map;
         //We found the user
         return true;
       }
@@ -508,12 +524,12 @@ int user_gethealth(const char* user)
 
 int user_getCount()
 {
-  return Mineserver::get()->users().size();
+  return Mineserver::get()->countUsers();
 }
 
 char* user_getUserNumbered(int c)
 {
-  return (char*)Mineserver::get()->users()[c]->nick.c_str();
+  return (char*)Mineserver::get()->getUser(c)->nick.c_str();
 }
 
 bool user_getItemInHand(const char* user, int *type, int *meta, int *quant)

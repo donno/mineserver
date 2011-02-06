@@ -75,7 +75,7 @@ public:
   bool dnd;
   int16_t health;
   uint16_t timeUnderwater;
-  unsigned int UID;
+  int32_t UID;
   std::string nick;
   std::string temp_nick;
   position pos;
@@ -96,7 +96,6 @@ public:
   //Input buffer
   Packet buffer;
 
-  static std::vector<User*>& all();
   static bool isUser(int sock);
   static User* byNick(std::string nick);
 
@@ -104,7 +103,7 @@ public:
   bool updatePos(double x, double y, double z, double stance);
   bool updatePosM(double x, double y, double z, int map,double stance);
   /** Check if the user is standing on this block */
-  bool checkOnBlock(int32_t x, int8_t y, int32_t z);
+  bool checkOnBlock(int32_t x, int8_t y, int32_t z) const;
   bool updateLook(float yaw, float pitch);
   int8_t relativeToBlock(const int32_t x, const int8_t y, const int32_t z);
 

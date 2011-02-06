@@ -30,7 +30,7 @@
 
 #include <iostream>
 #include <vector>
-#include <set>
+#include <map>
 
 #ifdef WIN32
   // This is needed for event to work on Windows.
@@ -84,7 +84,15 @@ public:
   bool stop();
   event_base* getEventBase();
 
-  std::vector<User*>& users() { return m_users; }
+  // User Management Operations
+  void addUser(User * user);
+  void removeUser(const User * user);
+  User *getUser(int index);
+  std::vector<User*>::size_type countUsers() const;
+  std::vector<User*>::iterator usersBegin();
+  std::vector<User*>::iterator usersEnd();
+  std::vector<User*>::const_iterator usersBegin() const;
+  std::vector<User*>::const_iterator usersEnd() const;
 
   struct event m_listenEvent;
   int m_socketlisten;
@@ -144,3 +152,4 @@ private:
 };
 
 #endif
+

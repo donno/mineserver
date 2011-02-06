@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <cassert>
+#include <algorithm>
 #include <deque>
 #include <map>
 #include <iostream>
@@ -208,6 +209,46 @@ event_base* Mineserver::getEventBase()
   return m_eventBase;
 }
 
+void Mineserver::addUser(User * user)
+{
+  m_users.push_back(user);
+}
+
+void Mineserver::removeUser(const User * user)
+{
+  std::vector<User*>::iterator it = std::find(m_users.begin(), m_users.end(), user);
+  if (it != m_users.end())
+  {
+    m_users.erase(it);
+  }
+}
+
+User *Mineserver::getUser(int index)
+{
+  return m_users[index];
+}
+
+std::vector<User*>::size_type Mineserver::countUsers() const
+{
+  return m_users.size();
+}
+std::vector<User*>::iterator Mineserver::usersBegin()
+{
+  return m_users.begin();
+}
+std::vector<User*>::iterator Mineserver::usersEnd()
+{
+  return m_users.end();
+}
+std::vector<User*>::const_iterator Mineserver::usersBegin() const
+{
+  return m_users.begin();
+}
+std::vector<User*>::const_iterator Mineserver::usersEnd() const
+{
+  return m_users.end();
+}
+
 void Mineserver::saveAll(){
   for(std::vector<Map*>::size_type i = 0; i<m_map.size(); i++){
     m_map[i]->saveWholeMap();
@@ -217,12 +258,16 @@ void Mineserver::saveAll(){
 
 void Mineserver::saveAllPlayers()
 {
-  if(users().size() == 0) return;
-  for (int32_t i = users().size()-1; i >= 0; i--)
+  if(countUsers() == 0) return;
+
+  for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+    it != Mineserver::get()->usersEnd();
+    ++it)
   {
-    if (users()[i]->logged)
+    User *user = *it;
+    if (user->logged)
     {
-      users()[i]->saveData();
+      user->saveData();
     }
   }
 }
@@ -435,16 +480,16 @@ int Mineserver::run(int argc, char *argv[])
       }
 
       // If users, ping them
-      if (User::all().size() > 0)
+      if (countUsers() > 0)
       {
         // 0x00 package
         uint8_t data = 0;
-        User::all()[0]->sendAll(&data, 1);
+        User::sendAll(&data, 1);
 
         // Send server time
         Packet pkt;
         pkt << (int8_t)PACKET_TIME_UPDATE << (int64_t)m_map[0]->mapTime;
-        User::all()[0]->sendAll((uint8_t*)pkt.getWrite(), pkt.getWriteLen());
+        User::sendAll((uint8_t*)pkt.getWrite(), pkt.getWriteLen());
       }
 
       //Check for tree generation from saplings
@@ -464,28 +509,32 @@ int Mineserver::run(int argc, char *argv[])
     {
       tick = (uint32_t)timeNow;
       // Loop users
-      for (int i = users().size()-1; i >= 0; i--)
+      for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+        it != Mineserver::get()->usersEnd();
+        ++it)
       {
+        User *user = *it;
         // No data received in 30s, timeout
-        if (users()[i]->logged && (timeNow-users()[i]->lastData) > 30)
+        if (user->logged && (timeNow-user->lastData) > 30)
         {
-          Mineserver::get()->logger()->log(LogType::LOG_INFO, "Sockets", "Player "+users()[i]->nick+" timed out");
+          Mineserver::get()->logger()->log(LogType::LOG_INFO, "Sockets", "Player "+ user->nick+" timed out");
 
-          delete users()[i];
+          delete user;
         }
-        else if (!users()[i]->logged && (timeNow-users()[i]->lastData) > 100)
+        else if (!user->logged && (timeNow-user->lastData) > 100)
         {
-          delete users()[i];
+          delete user;
+
         }
         else
         {
-          users()[i]->pushMap();
-          users()[i]->popMap();
+          user->pushMap();
+          user->popMap();
         }
 
         // Minecart hacks!!
         /*
-        if (User::all()[i]->attachedTo)
+        if (user->attachedTo)
         {
           Packet pkt;
           pkt << PACKET_ENTITY_VELOCITY << (int32_t)User::all()[i]->attachedTo <<  (int16_t)10000       << (int16_t)0 << (int16_t)0;
@@ -507,13 +556,6 @@ int Mineserver::run(int argc, char *argv[])
 
       }
 
-
-      for (int i = users().size()-1; i >= 0; i--)
-      {
-        users()[i]->pushMap();
-        users()[i]->popMap();
-      }
-
       // Check for Furnace activity
       Mineserver::get()->furnaceManager()->update();
 
@@ -523,11 +565,12 @@ int Mineserver::run(int argc, char *argv[])
 
     // Underwater check / drowning
     // ToDo: this could be done a bit differently? - Fador
-    int i = 0;
-    int s = User::all().size();
-    for (i=0;i<s;i++)
+    for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
+      it != Mineserver::get()->usersEnd();
+      ++it)
     {
-      User::all()[i]->isUnderwater();
+      User *user = *it;
+      user->isUnderwater();
     }
 
     event_base_loopexit(m_eventBase, &loopTime);
