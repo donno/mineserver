@@ -509,10 +509,12 @@ int Mineserver::run(int argc, char *argv[])
     {
       tick = (uint32_t)timeNow;
       // Loop users
-      for (std::vector<User*>::iterator it = Mineserver::get()->usersBegin();
-        it != Mineserver::get()->usersEnd();
-        ++it)
+
+      
+      std::vector<User*>::iterator it = Mineserver::get()->usersEnd();
+      do
       {
+        --it;
         User *user = *it;
         // No data received in 30s, timeout
         if (user->logged && (timeNow-user->lastData) > 30)
@@ -542,8 +544,7 @@ int Mineserver::run(int argc, char *argv[])
           User::all()[i]->sendAll((int8_t*)pkt.getWrite(), pkt.getWriteLen());
         }
         */
-
-      }
+      } while( it != usersBegin() );
 
       for(std::vector<Map*>::size_type i = 0 ; i<m_map.size(); i++)
       {
