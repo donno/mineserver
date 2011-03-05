@@ -32,7 +32,8 @@
 
 bool BlockFalling::affectedBlock(int block)
 {
-  switch(block){
+  switch (block)
+  {
   case BLOCK_SAND:
   case BLOCK_SLOW_SAND:
   case BLOCK_GRAVEL:
@@ -44,38 +45,51 @@ bool BlockFalling::affectedBlock(int block)
 
 void BlockFalling::onNeighbourBroken(User* user, int16_t oldblock, int32_t x, int8_t y, int32_t z, int map, int8_t direction)
 {
-   this->onNeighbourMove(user, oldblock, x, y, z, map, direction);
+  this->onNeighbourMove(user, oldblock, x, y, z, map, direction);
 }
 
 bool BlockFalling::onPlace(User* user, int16_t newblock, int32_t x, int8_t y, int32_t z, int map, int8_t direction)
 {
-   uint8_t oldblock;
-   uint8_t oldmeta;
+  uint8_t oldblock;
+  uint8_t oldmeta;
 
-   if (!Mineserver::get()->map(map)->getBlock(x, y, z, &oldblock, &oldmeta))
-      return true;
+  if (!Mineserver::get()->map(map)->getBlock(x, y, z, &oldblock, &oldmeta))
+  {
+    revertBlock(user, x, y, z, map);
+    return true;
+  }
 
-   /* Check block below allows blocks placed on top */
-   if (!this->isBlockStackable(oldblock))
-      return true;
+  /* Check block below allows blocks placed on top */
+  if (!this->isBlockStackable(oldblock))
+  {
+    revertBlock(user, x, y, z, map);
+    return true;
+  }
 
-   /* move the x,y,z coords dependent upon placement direction */
-   if (!this->translateDirection(&x,&y,&z,map, direction))
-      return true;
+  /* move the x,y,z coords dependent upon placement direction */
+  if (!this->translateDirection(&x, &y, &z, map, direction))
+  {
+    revertBlock(user, x, y, z, map);
+    return true;
+  }
 
-   if (this->isUserOnBlock(x,y,z,map))
-      return true;
+  if (this->isUserOnBlock(x, y, z, map))
+  {
+    revertBlock(user, x, y, z, map);
+    return true;
+  }
 
-   if (!this->isBlockEmpty(x,y,z,map))
-      return true;
+  if (!this->isBlockEmpty(x, y, z, map))
+  {
+    revertBlock(user, x, y, z, map);
+    return true;
+  }
 
-   direction = user->relativeToBlock(x, y, z);
+  Mineserver::get()->map(map)->setBlock(x, y, z, (char)newblock, 0);
+  Mineserver::get()->map(map)->sendBlockChange(x, y, z, (char)newblock, 0);
 
-   Mineserver::get()->map(map)->setBlock(x, y, z,(char)newblock, direction);
-   Mineserver::get()->map(map)->sendBlockChange(x, y, z,(char)newblock, direction);
-
-   applyPhysics(user,x,y,z,map);
-   return false;
+  applyPhysics(user, x, y, z, map);
+  return false;
 }
 
 void BlockFalling::onNeighbourMove(User* user, int16_t oldblock, int32_t x, int8_t y, int32_t z, int map, int8_t direction)
@@ -88,45 +102,45 @@ void BlockFalling::onNeighbourMove(User* user, int16_t oldblock, int32_t x, int8
     return;
   }
 
-  applyPhysics(user,x,y,z,map);
+  applyPhysics(user, x, y, z, map);
 }
 
 void BlockFalling::applyPhysics(User* user, int32_t x, int8_t y, int32_t z, int map)
 {
   uint8_t fallblock, block;
   uint8_t fallmeta, meta;
-   
+
   if (!Mineserver::get()->map(map)->getBlock(x, y, z, &fallblock, &fallmeta))
   {
     return;
   }
-   
-  while(Mineserver::get()->map(map)->getBlock(x, y-1, z, &block, &meta))
+
+  while (Mineserver::get()->map(map)->getBlock(x, y - 1, z, &block, &meta))
   {
-    switch(block)
+    switch (block)
     {
-      case BLOCK_AIR:
-      case BLOCK_WATER:
-      case BLOCK_STATIONARY_WATER:
-      case BLOCK_LAVA:
-      case BLOCK_STATIONARY_LAVA:
-        break;
-      default:
-        // stop falling
-        return;
-        break;
-     }
+    case BLOCK_AIR:
+    case BLOCK_WATER:
+    case BLOCK_STATIONARY_WATER:
+    case BLOCK_LAVA:
+    case BLOCK_STATIONARY_LAVA:
+      break;
+    default:
+      // stop falling
+      return;
+      break;
+    }
 
-     // Destroy original block
-     Mineserver::get()->map(map)->sendBlockChange(x, y, z, BLOCK_AIR, 0);
-     Mineserver::get()->map(map)->setBlock(x, y, z,BLOCK_AIR, 0);
+    // Destroy original block
+    Mineserver::get()->map(map)->sendBlockChange(x, y, z, BLOCK_AIR, 0);
+    Mineserver::get()->map(map)->setBlock(x, y, z, BLOCK_AIR, 0);
 
-     y--;
+    y--;
 
-     Mineserver::get()->map(map)->setBlock(x, y, z, fallblock, fallmeta);
-     Mineserver::get()->map(map)->sendBlockChange(x, y, z, fallblock, fallmeta);
+    Mineserver::get()->map(map)->setBlock(x, y, z, fallblock, fallmeta);
+    Mineserver::get()->map(map)->sendBlockChange(x, y, z, fallblock, fallmeta);
 
-     this->notifyNeighbours(x, y+1, z,map, "onNeighbourMove", user, block, BLOCK_BOTTOM);
-   }
+    this->notifyNeighbours(x, y + 1, z, map, "onNeighbourMove", user, block, BLOCK_BOTTOM);
+  }
 }
 

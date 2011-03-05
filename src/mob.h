@@ -42,17 +42,19 @@ class Mob
 {
 public:
   // Singular
-  int UID;
+  uint32_t UID;
   int8_t type;
-  int16_t x,y,z;
+  double x, y, z;
   int map;
   int8_t yaw, pitch;
   int8_t meta;
   bool spawned;
   bool respawnable;
+  int health;
 
   Mob(); // Dont create your own Mob, use Mobs.createMob()
   ~Mob();
+  void sethealth(int health);
 
   // Specifically packet-based commands
   void spawnToAll();
@@ -60,9 +62,9 @@ public:
   void relativeMoveToAll();
   void teleportToAll();
 
-  void moveTo(int16_t to_x,int16_t to_y, int16_t to_z, int to_map=-1);
+  void moveTo(double to_x, double to_y, double to_z, int to_map = -1);
+  void look(int16_t yaw, int16_t pitch);
 
-  
 };
 
 class Mobs
@@ -71,8 +73,14 @@ public:
   Mob* getMobByID(int id);
   int mobNametoType(std::string name);
   int getMobCount();
-  std::vector<Mob*> getAll(){ return m_moblist; };
-  void addMob(Mob* mob) { m_moblist.push_back(mob); }
+  std::vector<Mob*> getAll()
+  {
+    return m_moblist;
+  };
+  void addMob(Mob* mob)
+  {
+    m_moblist.push_back(mob);
+  }
   Mob* createMob();
 
 private:

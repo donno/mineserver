@@ -33,6 +33,9 @@
 #include <stdint.h>
 #include <iostream>
 
+// configuration from build system
+#include "configure.h"
+
 //
 // Mineserver constants
 //
@@ -42,9 +45,9 @@ enum
 {
   BLOCK_STATUS_STARTED_DIGGING,
   BLOCK_STATUS_DIGGING,
-  BLOCK_STATUS_STOPPED_DIGGING,
+  //BLOCK_STATUS_STOPPED_DIGGING,
   BLOCK_STATUS_BLOCK_BROKEN,
-  BLOCK_STATUS_PICKUP_SPAWN
+  BLOCK_STATUS_PICKUP_SPAWN = 0x4
 };
 
 // Chat colors
@@ -68,7 +71,7 @@ enum
 // Direction
 enum Direction
 {
-   BLOCK_BOTTOM, BLOCK_NORTH, BLOCK_SOUTH, BLOCK_EAST, BLOCK_WEST, BLOCK_TOP
+  BLOCK_BOTTOM, BLOCK_NORTH, BLOCK_SOUTH, BLOCK_EAST, BLOCK_WEST, BLOCK_TOP
 };
 
 // Blocks
@@ -93,7 +96,7 @@ enum Block
   BLOCK_REDSTONE_ORE, BLOCK_GLOWING_REDSTONE_ORE, BLOCK_REDSTONE_TORCH_OFF,
   BLOCK_REDSTONE_TORCH_ON, BLOCK_STONE_BUTTON, BLOCK_SNOW, BLOCK_ICE, BLOCK_SNOW_BLOCK,
   BLOCK_CACTUS, BLOCK_CLAY, BLOCK_REED, BLOCK_JUKEBOX, BLOCK_FENCE, BLOCK_PUMPKIN,
-  BLOCK_NETHERSTONE, BLOCK_SLOW_SAND, BLOCK_GLOWSTONE, BLOCK_PORTAL, BLOCK_JACK_O_LANTERN,BLOCK_CAKE
+  BLOCK_NETHERSTONE, BLOCK_SLOW_SAND, BLOCK_GLOWSTONE, BLOCK_PORTAL, BLOCK_JACK_O_LANTERN, BLOCK_CAKE
 };
 
 // Items
@@ -111,7 +114,7 @@ enum
   ITEM_CHAINMAIL_HELMET, ITEM_CHAINMAIL_CHESTPLATE, ITEM_CHAINMAIL_LEGGINGS,
   ITEM_CHAINMAIL_BOOTS, ITEM_IRON_HELMET, ITEM_IRON_CHESTPLATE, ITEM_IRON_LEGGINGS,
   ITEM_IRON_BOOTS, ITEM_DIAMOND_HELMET, ITEM_DIAMOND_CHESTPLATE, ITEM_DIAMOND_LEGGINGS,
-  ITEM_DIAMOND_BOOTS, ITEM_GOLD_HELMET, ITEM_GOLD_CHESTPLATE, ITEM_GOLD_LEGGINS,
+  ITEM_DIAMOND_BOOTS, ITEM_GOLD_HELMET, ITEM_GOLD_CHESTPLATE, ITEM_GOLD_LEGGINGS,
   ITEM_GOLD_BOOTS, ITEM_FLINT, ITEM_PORK, ITEM_GRILLED_PORK, ITEM_PAINTINGS,
   ITEM_GOLDEN_APPLE, ITEM_SIGN, ITEM_WOODEN_DOOR, ITEM_BUCKET, ITEM_WATER_BUCKET,
   ITEM_LAVA_BUCKET, ITEM_MINECART, ITEM_SADDLE, ITEM_IRON_DOOR, ITEM_REDSTONE,
@@ -138,7 +141,7 @@ enum
 // Animals
 enum
 {
-  MOB_PIG = 90, MOB_SHEEP, MOB_COW, MOB_CHICKEN
+  MOB_PIG = 90, MOB_SHEEP, MOB_COW, MOB_CHICKEN, MOB_SQUID
 };
 
 //Instruments (based off http://www.minecraftwiki.net/wiki/Note_Block)
@@ -150,24 +153,18 @@ enum
 
 const std::string VERSION = "0.1.15 (Alpha)";
 
-const int PROTOCOL_VERSION = 8;
+const int PROTOCOL_VERSION = 9;
 
 const char COMMENTPREFIX  = '#';
 
 // Configuration
 const std::string CONFIG_FILE = "config.cfg";
 
-/* Commands file
-const std::string COMMANDS_FILE    = "commands.cfg";
-const std::string COMMANDS_NAME_PREFIX = "cmd_";
-const std::string COMMANDS_CONTENT = "# This is default command permissions file. Add minimum permission rank after each command.";
-*/
-
 // PID file
 const std::string PID_FILE = "mineserver.pid";
 
 //
-// Blocks that drop special things!
+// Drops from blocks
 //
 struct Drop
 {
@@ -176,8 +173,8 @@ struct Drop
   uint8_t count;
   Drop* alt_drop;
 
-  Drop() : item_id(0),probability(0),count(0),alt_drop(NULL) {}
-  Drop(uint16_t _item_id, uint32_t _probability, uint8_t _count, Drop* _alt_drop=NULL) : item_id(_item_id),probability(_probability),count(_count),alt_drop(_alt_drop) {}
+  Drop() : item_id(0), probability(0), count(0), alt_drop(NULL) {}
+  Drop(uint16_t _item_id, uint32_t _probability, uint8_t _count, Drop* _alt_drop = NULL) : item_id(_item_id), probability(_probability), count(_count), alt_drop(_alt_drop) {}
 
   ~Drop()
   {

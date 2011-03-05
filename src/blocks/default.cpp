@@ -32,10 +32,7 @@
 
 bool BlockDefault::affectedBlock(int block)
 {
-  if(block < 256)
-  {
-    return true;
-  }
+  return true;
 }
 
 
@@ -56,18 +53,20 @@ bool BlockDefault::onBroken(User* user, int8_t status, int32_t x, int8_t y, int3
   uint8_t block;
   uint8_t meta;
 
-  if (!Mineserver::get()->map(map)->getBlock(x, y, z,&block, &meta))
+  if (!Mineserver::get()->map(map)->getBlock(x, y, z, &block, &meta))
   {
+    revertBlock(user, x, y, z, map);
     return true;
   }
-  if(block != BLOCK_GRAY_CLOTH && block != BLOCK_WOOD){
+  if (block != BLOCK_GRAY_CLOTH && block != BLOCK_WOOD)
+  {
     // Only Cloth and Wood have colour metadata
     meta = 0;
   }
 
   Mineserver::get()->map(map)->sendBlockChange(x, y, z, BLOCK_AIR, 0);
   Mineserver::get()->map(map)->setBlock(x, y, z, BLOCK_AIR, 0);
-  this->spawnBlockItem(x,y,z,map,block,meta);
+  this->spawnBlockItem(x, y, z, map, block, meta);
   return false;
 }
 
@@ -80,44 +79,45 @@ bool BlockDefault::onPlace(User* user, int16_t newblock, int32_t x, int8_t y, in
   uint8_t oldblock;
   uint8_t oldmeta;
 
-  if (!Mineserver::get()->map(map)->getBlock(x, y, z, &oldblock, &oldmeta))
+  if (newblock > 255)
   {
     return true;
   }
 
-  //Combine two steps
-  if(newblock == BLOCK_STEP && oldblock == BLOCK_STEP && direction == BLOCK_TOP)
+  if (!Mineserver::get()->map(map)->getBlock(x, y, z, &oldblock, &oldmeta))
   {
-     Mineserver::get()->map(map)->setBlock(x, y, z, (char)BLOCK_DOUBLE_STEP, 0);
-     Mineserver::get()->map(map)->sendBlockChange(x, y, z, (char)BLOCK_DOUBLE_STEP, 0);
-     return true;
+    revertBlock(user, x, y, z, map);
+    return true;
   }
 
   /* Check block below allows blocks placed on top */
   if (!this->isBlockStackable(oldblock))
   {
+    revertBlock(user, x, y, z, map);
     return true;
   }
 
-  /* move the x,y,z coords dependent upon placement direction */
-  if (!this->translateDirection(&x,&y,&z,map,direction))
+  if (!this->translateDirection(&x, &y, &z, map, direction))
   {
+    revertBlock(user, x, y, z, map);
     return true;
   }
 
-  if (this->isUserOnBlock(x,y,z,map))
+  if (this->isUserOnBlock(x, y, z, map))
   {
+    revertBlock(user, x, y, z, map);
     return true;
   }
 
-  if (!this->isBlockEmpty(x,y,z,map))
+  if (!this->isBlockEmpty(x, y, z, map))
   {
-    return true; 
+    revertBlock(user, x, y, z, map);
+    return true;
   }
 
   //direction = user->relativeToBlock(x, y, z);
 
-  if(newblock<256)
+  if (newblock < 256)
   {
     Mineserver::get()->map(map)->setBlock(x, y, z, (char)newblock, 0);
     Mineserver::get()->map(map)->sendBlockChange(x, y, z, (char)newblock, 0);
