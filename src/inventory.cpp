@@ -99,12 +99,18 @@ void Item::setType(int16_t type)
     count = 0;
     health = 0;
   }
+
   sendUpdate();
 }
 
 void Item::setCount(int8_t count)
 {
   this->count = count;
+  if(count < 1)
+  {
+    setType(-1);
+    return;
+  }
   sendUpdate();
 }
 
@@ -144,7 +150,7 @@ void Item::decCount(int c)
 
 void Item::incHealth(int c)
 {
-  int healthMax;
+  int healthMax = itemHealth(type);
   health += c;
   if (health > healthMax && healthMax > 0)
   {
@@ -202,7 +208,7 @@ int16_t Item::itemHealth(int item)
 }
 
 
-const std::string RECIPE_PATH = std::string(CONFIG_PATH_SHARE) + "recipes/";
+const std::string RECIPE_PATH = std::string(CONFIG_DIR_SHARE) + "recipes/";
 const std::string RECIPE_SUFFIX = ".recipe";
 const std::string RECIPE_LIST = "ENABLED_RECIPES.cfg";
 
@@ -833,7 +839,7 @@ bool Inventory::windowClick(User* user, int8_t windowID, int16_t slot, int8_t ri
     }
     else
     {
-      currentInventory->workbench[0] = Item();
+      currentInventory->workbench[0].setType(-1);
       setSlot(user, windowID, 0, -1, 0, 0);
     }
   }
@@ -845,7 +851,7 @@ bool Inventory::windowClick(User* user, int8_t windowID, int16_t slot, int8_t ri
     }
     else
     {
-      user->inv[0] = Item();
+      user->inv[0].setType(-1);
       setSlot(user, windowID, 0, -1, 0, 0);
     }
   }
