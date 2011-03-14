@@ -1,7 +1,7 @@
 from cake.tools import script, compiler, variant
 from cake import path
 from cake.library import flatten
-
+from glob import glob
 variantString = "%s_%s_%s" % (variant.compiler, variant.architecture, variant.release)
 
 # Sources List
@@ -16,6 +16,7 @@ sources = script.cwd('src', [
   'lighting.cpp',
   'logger.cpp',
   'map.cpp',
+  'mcregion.cpp',
   'mineserver.cpp',
   'mob.cpp',
   'nbt.cpp',
@@ -38,12 +39,14 @@ sources_blocks = script.cwd('src/blocks',[
   'chest.cpp',
   'default.cpp',
   'door.cpp',
+  'dyed.cpp',
   'falling.cpp',
   'fire.cpp',
   'ladder.cpp',
   'liquid.cpp',
   'note.cpp',
   'plant.cpp',
+  'redstone.cpp',
   'sign.cpp',
   'snow.cpp',
   'stair.cpp',
@@ -51,6 +54,9 @@ sources_blocks = script.cwd('src/blocks',[
   'tracks.cpp',
   'workbench.cpp',
   ])
+
+sources_items = script.cwd(
+  glob('src/items/*.cpp'))
 
 sources_config= script.cwd('src/config', [
   'lexer.cpp',
@@ -60,6 +66,7 @@ sources_config= script.cwd('src/config', [
   ])
 
 sources_worldgen= script.cwd('src/worldgen', [
+  'biomegen.cpp',
   'cavegen.cpp',
   'heavengen.cpp',
   'mapgen.cpp',
@@ -67,9 +74,15 @@ sources_worldgen= script.cwd('src/worldgen', [
   ])
 
 compiler.addIncludePath(script.cwd('mineserver/includes'))
-compiler.addLibrary('libevent')
-compiler.addLibrary('libnoise')
-compiler.addLibrary('zlibwapi')
+
+if variant.compiler == 'msvc':
+  compiler.addLibrary('libevent')
+  compiler.addLibrary('libnoise')
+  compiler.addLibrary('zlibwapi')
+else: # this currently assumes gcc
+  compiler.addLibrary('event')
+  compiler.addLibrary('noise')
+
 compiler.addDefine('FADOR_PLUGIN')
 
 # Windows only
@@ -77,7 +90,7 @@ if variant.platform == 'windows':
   compiler.addLibrary('Winmm')
   compiler.addLibrary('Ws2_32')
   compiler.addDefine('ZLIB_WINAPI')
-
+  #compiler.addLibrary('gtk-win32-2.0')
 
 def buildObjects(subFolder, sources):
   """ Helper function for creating the object sets """
@@ -88,12 +101,18 @@ def buildObjects(subFolder, sources):
 
 objects = buildObjects('', sources)
 objects_blocks = buildObjects('blocks',  sources_blocks)
-objects_blocks = buildObjects('blocks',  sources_blocks)
+objects_items = buildObjects('blocks',  sources_items)
 objects_config = buildObjects('configs',  sources_config)
 objects_worldgen = buildObjects('worldgen',  sources_worldgen)
 
 # Build the program.
 compiler.program(
   target=script.cwd('bin/mineserver_' + variantString),
-  sources=flatten([objects, objects_blocks, objects_config, objects_worldgen]),
+  sources=flatten([
+    objects,
+    objects_blocks, 
+    objects_config,
+    objects_items,
+    objects_worldgen,
+    ]),
   )
